@@ -3065,6 +3065,32 @@ describe('PUCRio_v5_1_Parser', () => {
             ],
           });
         });
+        it('should parse a zero', async () => {
+          const parser = new PUCRio_v5_1_Parser('return 0');
+          const chunk = await parser.parse();
+          shouldContain(chunk, {
+            body: [
+              {
+                type: NodeType.Statement,
+                statementType: StatementType.ReturnStatement,
+                children: [
+                  {
+                    type: NodeType.ExpressionList,
+                    children: [
+                      {
+                        type: NodeType.Expression,
+                        expressionType: ExpressionType.NumberExpression,
+                        raw: '0',
+                        value: 0,
+                        children: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          });
+        })
       });
     });
 
@@ -3393,6 +3419,266 @@ describe('PUCRio_v5_1_Parser', () => {
           ],
         });
       });
+      it('should parse a function with table paramaters, even without a trailing comma', async () => {
+        const parser = new PUCRio_v5_1_Parser('function tableConstructorExpression(a) return {a[1], a[2], a[3]} end return tableConstructorExpression({1,2,3})');
+        const chunk = await parser.parse();
+        shouldContain(chunk, {
+          children: [
+            {
+              statementType: StatementType.FunctionDeclaration,
+              type: NodeType.Statement,
+              isLastStatement: false,
+              children: [
+                {
+                  type: NodeType.FunctionName,
+                  children: [
+                    {
+                      type: NodeType.Name,
+                      name: 'tableConstructorExpression',
+                      children: [],
+                    }
+                  ]
+                },
+                {
+                  type: NodeType.FuncBody,
+                  children: [
+                    {
+                      type: NodeType.ParameterList,
+                      children: [
+                        {
+                          type: NodeType.NameList,
+                          children: [
+                            {
+                              type: NodeType.Name,
+                              name: 'a',
+                              children: []
+                            }
+                          ]
+                        }
+                      ],
+                      vararg: false,
+                    },
+                    {
+                      type: NodeType.Chunk,
+                      children: [
+                        {
+                          statementType: StatementType.ReturnStatement,
+                          type: NodeType.Statement,
+                          isLastStatement: true,
+                          children: [
+                            {
+                              type: NodeType.ExpressionList,
+                              children: [
+                                {
+                                  expressionType: ExpressionType.TableConstructorExpression,
+                                  type: NodeType.Expression,
+                                  children: [
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.PrefixExpression,
+                                          prefixExpressionType: PrefixExpressionType.Variable,
+                                          variablePrefixExpressionType: VariablePrefixExpressionType.Index,
+                                          children: [
+                                            {
+                                              type: NodeType.Expression,
+                                              expressionType: ExpressionType.PrefixExpression,
+                                              prefixExpressionType: PrefixExpressionType.Variable,
+                                              variablePrefixExpressionType: VariablePrefixExpressionType.Name,
+                                              children: [
+                                                {
+                                                  type: NodeType.Name,
+                                                  name: 'a',
+                                                  children: []
+                                                },
+                                              ]
+                                            },
+                                            {
+                                              expressionType: ExpressionType.NumberExpression,
+                                              type: NodeType.Expression,
+                                              raw: '1',
+                                              children: [],
+                                              value: 1
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.PrefixExpression,
+                                          prefixExpressionType: PrefixExpressionType.Variable,
+                                          variablePrefixExpressionType: VariablePrefixExpressionType.Index,
+                                          children: [
+                                            {
+                                              type: NodeType.Expression,
+                                              expressionType: ExpressionType.PrefixExpression,
+                                              prefixExpressionType: PrefixExpressionType.Variable,
+                                              variablePrefixExpressionType: VariablePrefixExpressionType.Name,
+                                              children: [
+                                                {
+                                                  type: NodeType.Name,
+                                                  name: 'a',
+                                                  children: []
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              expressionType: ExpressionType.NumberExpression,
+                                              type: NodeType.Expression,
+                                              raw: '2',
+                                              children: [],
+                                              value: 2
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.PrefixExpression,
+                                          prefixExpressionType: PrefixExpressionType.Variable,
+                                          variablePrefixExpressionType: VariablePrefixExpressionType.Index,
+                                          children: [
+                                            {
+                                              type: NodeType.Expression,
+                                              expressionType: ExpressionType.PrefixExpression,
+                                              prefixExpressionType: PrefixExpressionType.Variable,
+                                              variablePrefixExpressionType: VariablePrefixExpressionType.Name,
+                                              children: [
+                                                {
+                                                  type: NodeType.Name,
+                                                  name: 'a',
+                                                  children: []
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              expressionType: ExpressionType.NumberExpression,
+                                              type: NodeType.Expression,
+                                              raw: '3',
+                                              children: [],
+                                              value: 3
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              statementType: StatementType.ReturnStatement,
+              type: NodeType.Statement,
+              isLastStatement: true,
+              children: [
+                {
+                  type: NodeType.ExpressionList,
+                  children: [
+                    {
+                      type: NodeType.Expression,
+                      expressionType: ExpressionType.PrefixExpression,
+                      prefixExpressionType: PrefixExpressionType.FunctionCall,
+                      children: [
+                        {
+                          type: NodeType.Expression,
+                          expressionType: ExpressionType.PrefixExpression,
+                          prefixExpressionType: PrefixExpressionType.Variable,
+                          variablePrefixExpressionType: VariablePrefixExpressionType.Name,
+                          children: [
+                            {
+                              type: NodeType.Name,
+                              name: 'tableConstructorExpression',
+                              children: []
+                            }
+                          ]
+                        },
+                        {
+                          type: NodeType.Arguments,
+                          argumentsType: ArgumentsType.ExpressionList,
+                          children: [
+                            {
+                              type: NodeType.ExpressionList,
+                              children: [
+                                {
+                                  type: NodeType.Expression,
+                                  expressionType: ExpressionType.TableConstructorExpression,
+                                  children: [
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.NumberExpression,
+                                          raw: '1',
+                                          children: [],
+                                          value: 1
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.NumberExpression,
+                                          raw: '2',
+                                          children: [],
+                                          value: 2
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      fieldType: FieldType.Expression,
+                                      type: NodeType.Field,
+                                      children: [
+                                        {
+                                          type: NodeType.Expression,
+                                          expressionType: ExpressionType.NumberExpression,
+                                          raw: '3',
+                                          children: [],
+                                          value: 3
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        )
+      })
       it('should fail on unterminated table', async () => {
         const parser = new PUCRio_v5_1_Parser('return {');
         await assert.rejects(parser.parse());

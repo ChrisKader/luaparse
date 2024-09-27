@@ -209,6 +209,11 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
     return new Chunk(statements);
   }
 
+  async parseBreakStatement(): Promise<BreakStatement> {
+    this.expect('break');
+    return new BreakStatement();
+  }
+
   protected async parseStatement(): Promise<Statement | null> {
     const token = this.lookahead;
     if (!token) {
@@ -219,7 +224,7 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
       case 'return':
         return this.parseReturnStatement();
       case 'break':
-        return new BreakStatement();
+        return this.parseBreakStatement();
       case 'do':
         return this.parseDoStatement();
       case 'while':
@@ -452,6 +457,9 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
       const right = await this.parseExpression();
       if (!right) {
         throw this.parserError('expected expression');
+      }
+      if (!(['-', 'not', '~', '#'].includes(unaryOperator.value))) {
+        throw this.parserError(`expected unary operator but got ${unaryOperator.value}`);
       }
       expression = new UnaryOperationExpression(unaryOperator.value, right);
     }
@@ -747,7 +755,7 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
     for (let i = decimalIndex + 1; i < exponentIndex; i++) {
       const raw = value[i + startIndex];
       const digit = digits[raw];
-      if (!digit) {
+      if (digit === undefined) {
         throw this.parserError('malformed number');
       }
       retn += digit * radix ** exponent--;
@@ -772,7 +780,7 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
       for (let i = value.length - 1; i > exponentIndex + startIndex; i--) {
         const raw = value[i];
         const digit = exponentDigits[raw];
-        if (!digit) {
+        if (digit === undefined) {
           throw this.parserError('malformed number');
         }
         exponentValue += digit * 10 ** exponent++;
@@ -814,7 +822,7 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
         break;
     }
 
-    if (!value) {
+    if (value === undefined) {
       throw this.parserError('expected number');
     }
 
@@ -956,6 +964,11 @@ export class PUCRio_v5_1_Parser extends Tokenizer implements AstParser {
       }
 
       fields.push(field);
+      // Check to see if table ends without a trailing comma.
+      if (this.lookahead?.value === '}') {
+        this.consume('}')
+        break;
+      }
       if (!this.consume(',') && !this.consume(';')) {
         break;
       }

@@ -376,10 +376,10 @@ export class Tokenizer extends TokenizerState {
   expect(expected: string) {
     const next = this.next;
     if (!next) {
-      throw new Error(`expected '${expected}' near <eof>`);
+      throw new Error(`expected '${expected}' near <eof> at ${this.lineNumber}:${this.columnNumber}`);
     }
     if (next.value !== expected) {
-      throw new Error(`expected '${expected}' near '${next.value}'`);
+      throw new Error(`expected '${expected}' near '${next.value} at ${next.lineNumber}:${next.columnNumber}'`);
     }
   }
 }
